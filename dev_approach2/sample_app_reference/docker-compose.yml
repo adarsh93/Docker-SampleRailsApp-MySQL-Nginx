@@ -1,0 +1,42 @@
+version: "3"
+services:
+
+ web:
+   build: ../nginx
+   ports:
+     - "80:80"
+   depends_on:
+     - app
+   networks:
+     - frontend
+ 
+ db:
+   image: mysql:latest
+   expose:
+     - "3306"
+   environment:
+     - MYSQL_ROOT_PASSWORD=sampleapp
+   networks:
+     - backend
+   volumes:
+     - mysqldata:/var/lib/mysql
+ 
+ app:
+   build: .
+   command: bin/rails server --port 3000 --binding 0.0.0.0
+   depends_on:
+     - db
+   expose:
+     - "3000"
+   volumes:
+     - .:/sampleapp
+   networks:
+     - frontend
+     - backend
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  mysqldata:
